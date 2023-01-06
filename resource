@@ -1,1 +1,0 @@
-Training data from:https://wiki.seg.org/wiki/Open_data
