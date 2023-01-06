@@ -1,5 +1,5 @@
 # SCRN
-Swin transformer for simultaneous denoising and interpolation of 38 seismic data
+Swin transformer for simultaneous denoising and interpolation of seismic data
 
 SCRN:      network model.
 
