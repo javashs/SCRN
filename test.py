@@ -4,7 +4,7 @@ import time
 import torch
 if __name__ == '__main__':
 
-    model = torch.load('trained_model\\model_041.pth')
+    model = torch.load('trained_model\\model.pth')
 
     model.eval()  # evaluation mode
     if torch.cuda.is_available():
@@ -39,13 +39,15 @@ if __name__ == '__main__':
     ssim = ssim_(x_, x)
     print("After：ssim" + str(ssim))
 
-    imgplot1 = plt.imshow(x, cmap=plt.cm.seismic,  aspect='auto', vmin=-1.2, vmax=1.2)
+    imgplot1 = plt.imshow(x, cmap=plt.cm.seismic,  aspect='auto', vmin=-1, vmax=1)
     plt.show()
 
-    imgplot1 = plt.imshow(y, cmap=plt.cm.seismic,  aspect='auto', vmin=-1.2, vmax=1.2)
+    imgplot1 = plt.imshow(y, cmap=plt.cm.seismic,  aspect='auto', vmin=-1, vmax=1)
     plt.show()
 
-    imgplot1 = plt.imshow(x_, cmap=plt.cm.seismic, aspect='auto', vmin=-1.2, vmax=1.2)
+    imgplot1 = plt.imshow(x_, cmap=plt.cm.seismic, aspect='auto', vmin=-1, vmax=1)
+    plt.xlabel('Trace')
+    plt.ylabel('Samples')
     plt.show()
 
 
