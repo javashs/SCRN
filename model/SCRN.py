@@ -151,27 +151,27 @@ class SCRN(nn.Module):
         self.m_head = [nn.Conv2d(in_nc, dim, 3, 1, 1, bias=False)]
 
         begin = 0
-        self.m1 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW', input_resolution)
+        self.m1 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if i%2 else 'SW', input_resolution)
                       for i in range(config[0])] + \
                       [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
 
         begin += config[0]
-        self.m2 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW', input_resolution)
+        self.m2 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if i%2 else 'SW', input_resolution)
                       for i in range(config[1])] + \
                       [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
 
         begin += config[1]
-        self.m3 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW',input_resolution)
+        self.m3 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if i%2 else 'SW',input_resolution)
                       for i in range(config[2])] + \
                       [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
 
         begin += config[2]
-        self.m4 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW',input_resolution)
+        self.m4 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if i%2 else 'SW',input_resolution)
                       for i in range(config[2])] + \
                       [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
 
         begin += config[3]
-        self.m5 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW',input_resolution)
+        self.m5 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if i%2 else 'SW',input_resolution)
                       for i in range(config[2])] + \
                      [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
 
