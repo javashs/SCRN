@@ -27,9 +27,9 @@ class MyDatasets(data.Dataset):
 
     def __getitem__(self, index):
         data_index = self.Targetdata[index]
-        # 确定矩阵初始截取y点
+        
         start_point_y = self.start_point_y
-        #确定训练数据大小
+        #Determine training data size
         data_size = self.Data_size
 
         data_target = (np.load(os.path.join(self.Target_root_dir,data_index),allow_pickle=True))
@@ -40,11 +40,11 @@ class MyDatasets(data.Dataset):
         data_input = mask*data_target
         
         SNR = (random.sample([-2,-1,1,5,10], 1))[0]
-        noise = np.random.randn(data_target.shape[0],data_target.shape[1]) 	#产生N(0,1)噪声数据
-        noise = noise - np.mean(noise) 								#均值为0
-        signal_power = np.linalg.norm(data_target - data_target.mean())**2 / data_target.size	#此处是信号的std**2
-        noise_variance = signal_power/np.power(10, (SNR/10))         #此处是噪声的std**2
-        noise = (np.sqrt(noise_variance) / np.std(noise)) * noise    ##此处是噪声的std**2
+        noise = np.random.randn(data_target.shape[0],data_target.shape[1]) 	#Generate N(0,1) noise data
+        noise = noise - np.mean(noise) 								#mean is 0
+        signal_power = np.linalg.norm(data_target - data_target.mean())**2 / data_target.size	#Here is the std**2 of the signal
+        noise_variance = signal_power/np.power(10, (SNR/10))         #Here is the std**2 of the noise
+        noise = (np.sqrt(noise_variance) / np.std(noise)) * noise    
         
         data_input = noise + data_input
 
@@ -62,15 +62,15 @@ class MyDatasets(data.Dataset):
         return data_input, data_target
 
 
-        # #根据索引item获取该输入数据
+        # Get the input data based on the index item
         # data_index = self.Targetdata[index]
         # data_target = (np.load(os.path.join(self.Target_root_dir,data_index),allow_pickle=True))
         # SNR = (random.sample([-2,0,2,4,6,8,10], 1))[0]
-        # noise = np.random.randn(data_target.shape[0],data_target.shape[1]) 	#产生N(0,1)噪声数据
-        # noise = noise - np.mean(noise) 								#均值为0
-        # signal_power = np.linalg.norm(data_target - data_target.mean())**2 / data_target.size	#此处是信号的std**2
-        # noise_variance = signal_power/np.power(10, (SNR/10))         #此处是噪声的std**2
-        # noise = (np.sqrt(noise_variance) / np.std(noise)) * noise    ##此处是噪声的std**2
+        # noise = np.random.randn(data_target.shape[0],data_target.shape[1]) 	
+        # noise = noise - np.mean(noise) 								
+        # signal_power = np.linalg.norm(data_target - data_target.mean())**2 
+        # noise_variance = signal_power/np.power(10, (SNR/10))         
+        # noise = (np.sqrt(noise_variance) / np.std(noise)) * noise   
         # data_input = noise + data_target
         # (l, w) = data_input.shape
         # data_input = data_input.reshape((l,w,1))
