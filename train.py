@@ -12,7 +12,7 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import MultiStepLR
 from util.My_tool1 import save_csv, produce_csv
 
-# 添加参数
+# Add parameters
 parser = argparse.ArgumentParser(description='PyTorch SCRN')
 parser.add_argument('--model', default='SCRN', type=str, help='choose a type of model')
 parser.add_argument('--train_data_dir', default=r'/workspace/Paper2/TrainData11', type=str,
