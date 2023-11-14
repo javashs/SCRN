@@ -278,9 +278,9 @@ def datagenerator(data_dir, patch_size=(128, 128), stride=(32, 32), train_data_n
         agc: if use the agc of the test_data
     '''
 
-    if download:  # download=False,跳过下载
-        if datasets > 0:  # 数据集个数大于0，开始下载
-            Download_data(data_dir, datasets=datasets)  # 下载到对应目录
+    if download:  # download=False
+        if datasets > 0:  
+            Download_data(data_dir, datasets=datasets) 
         else:
             print("=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>")
             print("Please input the num of the dataset to download ")
@@ -294,22 +294,19 @@ def datagenerator(data_dir, patch_size=(128, 128), stride=(32, 32), train_data_n
     for i in range(len(file_list)):
 
         with segyio.open(file_list[i], 'r', ignore_geometry=True) as f:
-            f.mmap()  # 映射入内存，加快读取速度
+            f.mmap()  
             sourceX = f.attributes(segyio.TraceField.SourceX)[:]
-            trace_num = len(sourceX)  # 道数
-            shot_num = len(set(sourceX))  # 炮数
+            trace_num = len(sourceX)  
+            shot_num = len(set(sourceX))  
 
             if (trace_num == shot_num ):
                 shot_num = 1
                 len_shot = trace_num
-                print('单炮')
             elif(shot_num==1):
                 shot_num = 1
                 len_shot = trace_num
-                print('单炮')
             else :
-                len_shot = trace_num // shot_num  # 每一炮的数据长度
-                print('多炮')
+                len_shot = trace_num // shot_num  
             '''
             The test_data of each shot is read separately
             The default is that the test_data dimensions collected by all shots in the file are the same.
@@ -318,29 +315,25 @@ def datagenerator(data_dir, patch_size=(128, 128), stride=(32, 32), train_data_n
             '''
             q = -1
             for j in range(0, shot_num, jump):
-                # 获取每一道和采样点数，并进行转置
                 data = np.asarray([np.copy(x) for x in f.trace[j * len_shot:(j + 1) * len_shot]]).T
                 q += 1
-                if agc:  # 振幅归一化
+                if agc:  
                     print("agc")
                     data = gain(data, 0.004, 'agc', 0.05, 1)
                 else:
-                    print("归一化")
                     data = data / np.max(abs(data))
 
                 # Number of shots used to generate the patch
-                select_shot_num = len(list(range(0, shot_num, jump)))  # 选择的炮长数
+                select_shot_num = len(list(range(0, shot_num, jump)))  
                 h, w = data.shape
                 p_h, p_w = patch_size
                 s_h, s_w = stride
-                # 一炮数据的块被分成多个patch块
                 single_patches_num = int(
                     _compute_total_patches(h, w, p_h, p_w, s_h, s_w, aug_times, scales, max_patches=None))
 
                 if verbose:
-                    # 一炮数据的块被分成多个patch块*(总的炮数/jump)=总的块
                     total_patches_num = single_patches_num * select_shot_num
-                    # 分割成小块
+                    # Break into small pieces.
                     patches, patch_num = gen_patches(data, patch_size, stride, i, len(file_list), total_patches_num,
                                                      train_data_num, patch_num, aug_times, scales, q,
                                                      single_patches_num, verbose)
@@ -379,93 +372,17 @@ if __name__ == '__main__':
     '''
     root (string): the .segy file exists or will be saved to if download is set to True.
     train patch_size=(128, 128), stride=(48, 48)，aug_times=4, i+1
-    
-    ['test_data/train\\1997_new.segy', 'test_data/train\\7m_shots_new.segy', 'test_data/train\\Anisotropic_new.segy', 'test_data/train\\kerry3d_2.segy', 'test_data/train\\shots0001_new.segy', 'test_data/train\\SYN_new.segy', 'test_data/train\\SEAM_Shots_train.sgy']
-多炮
-归一化
-[1/7][#####                                             ] 10% 30归一化
-[1/7][##########                                        ] 20% 60归一化
-[1/7][###############                                   ] 30% 90归一化
-[1/7][####################                              ] 40% 120归一化
-[1/7][#########################                         ] 50% 150归一化
-[1/7][##############################                    ] 60% 180归一化
-[1/7][###################################               ] 70% 210归一化
-[1/7][########################################          ] 80% 240归一化
-[1/7][#############################################     ] 90% 270归一化
-[1/7][##################################################] 100% 300 
-单炮
-归一化
-[2/7][##################################################] 100% 3655 
-多炮
-归一化
-[3/7][#########################                         ] 50% 4030归一化
-[3/7][##################################################] 100% 4405 
-单炮
-归一化
-[4/7][##################################################] 100% 4885 
-多炮
-归一化
-[5/7][################                                  ] 33% 6840归一化
-[5/7][#################################                 ] 66% 8795归一化
-[5/7][##################################################] 100% 10750 
-单炮
-归一化
-[6/7][##################################################] 100% 13500 
-多炮
-归一化
-[7/7][#########################                         ] 50% 15365归一化
-[7/7][##################################################] 100% 17230 
-17230 training test_data finished
-
-    
-   
-    
-    
-    '''
-
-    # root = 'test_data/train/'
-    # train_data = datagenerator(data_dir=root, patch_size=(128, 128), stride=(48, 48), train_data_num=18000,
-    #                            download=False, datasets=0, aug_times=4, scales=[1], verbose=True, jump=1, agc=False)
-    # train_data = train_data.astype(np.float32)
-    # xs = train_data.transpose((0, 3, 1, 2))
-    # for i in range(len(xs)):
-    #     np.save('TrainData11/train_data_%d' % (i + 1), xs[i][0])
-
-    """
-    ['test_data/test\\Anisotropic_test_new.segy', 'test_data/test\\shots0001_test_new.segy', 'test_data/test\\SYNtest1.segy', 'test_data/test\\SYNtest2.segy', 'test_data/test\\SYNtest3.segy', 'test_data/test\\SYN_test_new.segy']
-单炮
-归一化
-[1/6][##################################################] 100% 75 
-单炮
-归一化
-[2/6][##################################################] 100% 466 
-单炮
-归一化
-[3/6][##################################################] 100% 470 
-单炮
-归一化
-[4/6][##################################################] 100% 474 
-单炮
-归一化
-[5/6][##################################################] 100% 478 
-单炮
-归一化
-[6/6][##################################################] 100% 500 
-500 training test_data finished
-
-Process finished with exit code 0
-
     """
 
-    root = 'data/train/'
+    root = 'data/train/' #The path to load the dataset.
     train_data = datagenerator(data_dir=root, patch_size=(128, 128), stride=(48, 48), train_data_num=10,
                                download=False, datasets=0, aug_times=0, scales=[1], verbose=True, jump=1, agc=False)
     train_data = train_data.astype(np.float32)
     print(train_data.shape)
     xs = train_data.transpose((0, 3, 1, 2))
     print(xs.shape)
-    # for i in range(len(xs)):
-    #     np.save('TestData11/test_data_%d' % (i + 1), xs[i][0])
+    for i in range(len(xs)):
+        np.save('TestData11/test_data_%d' % (i + 1), xs[i][0]) #The path to save.
 
     # root = 'test_data/real_noise/'
     # real_noise_data = datagenerator(data_dir=root, patch_size=(128, 128), stride=(1, 1), train_data_num=2000,
