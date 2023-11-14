@@ -43,9 +43,9 @@ if __name__ == '__main__':
         model = model.to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
-    # 动态调整学习速率
+    # Dynamically adjust learning rate
     # torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones, gamma=0.1, last_epoch=-1)
-    # milestones为一个数组，如 [50,70]. gamma为倍数。如果learning rate开始为0.01 ，则当epoch为50时变为0.001，epoch 为70 时变为0.0001。
+    # milestones is an array, such as [50,70]. gamma is a multiple. If the learning rate starts at 0.01, it becomes 0.001 when epoch is 50, and becomes 0.0001 when epoch is 70.
     scheduler = MultiStepLR(optimizer, milestones=[20, 40, 60], gamma=0.2)  # learning rates
 
     # dataloader
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         running_loss = 0.0
         start_time = time.time()
         for (Input, Target) in dataloader:
-            # 将数据放在GPU上训练
+            # Put the data on the GPU for training
             X, Y = Variable(Input).to(device), Variable(Target).to(device)
             X = X.type(torch.float32)
             Y = Y.type(torch.float32)
@@ -73,7 +73,7 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-            # 损失和
+            # losses
             running_loss += loss.data.item()
             epoch_loss = running_loss * batch_size / len(data)
             step += batch_size
@@ -84,36 +84,29 @@ if __name__ == '__main__':
         torch.save(model, '/workspace/Paper2/SCRN/trained_model/model_%03d.pth' % (epoch + 1))
 
     #     #########################################
-    #     # TODO：开启测试
+    #     # TODO：Start testing
     #     model.eval()
     #
     #     data_path = r'..\Data\Numpy_DATA\test\theoretical_1NoiseData1.npy'
     #     original_data_path = r'..\Data\Numpy_DATA\Original\theoreticalData1.npy'
-    #     # 读取数据
+    #     # Read data
     #     data_input_z = np.load()
     #     # print(np.min(data_input_z))
-    #     # 数据转换为tensor
+    #     # Convert data to tensor
     #     data_input_z_tensor = data_trans(data_input_z)
     #     data_input_z_tensor = data_input_z_tensor.unsqueeze(0)
-    #     # 将数据放入GPU
+    #     # Put data into GPU
     #     data_input_z_tensor = (Variable(data_input_z_tensor).to(device)).type(torch.float32)
     #     data_input_s = np.load()
     #
-    #     # 模型预测概率
+    #     # Model prediction probability
     #     y_pred = model(data_input_z_tensor)
-    #     # 将数据降维
+    #     # Dimensionality reduction of data
     #     out = y_pred.squeeze(0)
-    #     # 将数据从gpu放入cpu并再次降维
+    #     # Put data from gpu into cpu and reduce dimensionality again
     #     imag_narry = ((out.squeeze(0)).cuda().test_data.cpu()).detach().numpy()
     #
     #     out_data = imag_narry
     #
-    #     print()
-    #     print('去噪前, 峰值信噪比为:{}'.format(tool.__mtx_similar2__(data_input_z, data_input_s)))
-    #     print('去噪后, 峰值信噪比为:{}'.format(tool.__mtx_similar2__(out_data, data_input_s)))
-    #     print('去噪前, 信噪比为:{}'.format(tool.__SNR__(data_input_z, data_input_s)))
-    #     print('去噪后, 信噪比为:{}'.format(tool.__SNR__(out_data, data_input_s)))
-    #     print('去噪前, 结构相似性：{}'.format(sk_cpt_ssim(data_input_z, data_input_s)))
-    #     print('去噪后, 结构相似性：{}'.format(sk_cpt_ssim(out_data, data_input_s)))
     #
     # time_end = time.time() - time_open
