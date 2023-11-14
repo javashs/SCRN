@@ -1,5 +1,5 @@
 # SCRN
-Swin transformer for simultaneous denoising and interpolation of seismic data
+Swin Transformer for simultaneous denoising and interpolation of seismic data
 
 Step 1: Download the dataset. 
 Run the download_data.py file under the util file. If the download speed is slow, please go to this URL (https://wiki.seg.org/wiki) to download.
