@@ -7,7 +7,7 @@ Run the download_data.py file under the util file. If the download speed is slow
 Step 2: Split the dataset. 
 Run the get_patch.py file under the util file. Split segy files into patches and save them in npy data format.
 
-Step 3: Training patches data. 
+Step 3: Training patches dataset. 
 Please run the train.py file directly.
 
 Step 4: Test the model. 
