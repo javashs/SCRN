@@ -138,4 +138,78 @@ class ConvTransBlock(nn.Module):
         return x
 
 
+class SCRN(nn.Module):
+    def __init__(self, in_nc=1, config=[1,1,1,1,1], dim=64, drop_path_rate=0.0, input_resolution=128):
+        super(SCRN, self).__init__()
+        self.config = config
+        self.dim = dim
+        self.head_dim = 32
+        self.window_size = 8
+
+        dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(config))]
+
+        self.m_head = [nn.Conv2d(in_nc, dim, 3, 1, 1, bias=False)]
+
+        begin = 0
+        self.m1 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW', input_resolution)
+                      for i in range(config[0])] + \
+                      [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
+
+        begin += config[0]
+        self.m2 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW', input_resolution)
+                      for i in range(config[1])] + \
+                      [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
+
+        begin += config[1]
+        self.m3 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW',input_resolution)
+                      for i in range(config[2])] + \
+                      [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
+
+        begin += config[2]
+        self.m4 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW',input_resolution)
+                      for i in range(config[2])] + \
+                      [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
+
+        begin += config[3]
+        self.m5 = [ConvTransBlock(dim//2, dim//2, self.head_dim, self.window_size, dpr[i+begin], 'W' if not i%2 else 'SW',input_resolution)
+                      for i in range(config[2])] + \
+                     [nn.Conv2d(dim, dim, 3, 1, 1, bias=False)]
+
+        self.m_tail = [nn.Conv2d(dim, in_nc, 3,1, 1, bias=False)]
+        self.m_head = nn.Sequential(*self.m_head)
+        self.m1 = nn.Sequential(*self.m1)
+        self.m2 = nn.Sequential(*self.m2)
+        self.m3 = nn.Sequential(*self.m3)
+        self.m4 = nn.Sequential(*self.m4)
+        self.m5 = nn.Sequential(*self.m5)
+        self.m_tail = nn.Sequential(*self.m_tail)
+        self.apply(self._init_weights)
+
+    def forward(self, x0):
+        h, w = x0.size()[-2:]
+        x1 = self.m_head(x0)
+        x2 = self.m1(x1)
+        x3 = self.m2(x2)
+        x4 = self.m3(x3)
+        x5 = self.m4(x4+x3)
+        x6 = self.m5(x5+x2)
+        x7 = self.m_tail(x6+x1)
+        x7 = x7[..., :h, :w]
+        return x7
+
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            trunc_normal_(m.weight, std=.02)
+            if m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+        elif isinstance(m, nn.LayerNorm):
+            nn.init.constant_(m.bias, 0)
+            nn.init.constant_(m.weight, 1.0)
+
+
+if __name__ == '__main__':
+    net = SCRN()
+    print(net)
+    x = torch.randn((1, 1, 128, 128))
+    x = net(x)
 
